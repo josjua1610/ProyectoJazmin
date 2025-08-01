@@ -68,53 +68,57 @@ const ArticleList = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Lista de Productos</h2>
-      <ul>
-        {articles.length > 0 ? (
-          articles.map(article => (
-            <li key={article._id || article.id} style={{ marginBottom: '10px' }}>
-              <strong>{article.descripcion}</strong><br />
-              Precio: ${article.price} | Stock: {article.stock}
-              <br />
-              <button onClick={() => eliminarArticulo(article._id || article.id)}>Eliminar</button>
-              <button onClick={() => iniciarEdicion(article)}>Editar</button>
-            </li>
-          ))
-        ) : (
-          <p>No hay productos registrados.</p>
-        )}
-      </ul>
+    <div className="auth-container1">
+    <h2>Lista de Productos</h2>
 
-      {editando && (
-        <form onSubmit={actualizarArticulo} style={{ marginTop: '20px' }}>
-          <h3>Editar Producto</h3>
-          <input
-            type="text"
-            placeholder="Descripción"
-            value={formData.descripcion}
-            onChange={e => setFormData({ ...formData, descripcion: e.target.value })}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Precio"
-            value={formData.price}
-            onChange={e => setFormData({ ...formData, price: e.target.value })}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Stock"
-            value={formData.stock}
-            onChange={e => setFormData({ ...formData, stock: e.target.value })}
-            required
-          />
-          <button type="submit">Guardar Cambios</button>
-          <button type="button" onClick={() => setEditando(null)}>Cancelar</button>
-        </form>
-      )}
+  <div className="productos-grid">
+    {articles.length > 0 ? (
+      articles.map(article => (
+        <div key={article._id || article.id} className="producto-card">
+          <strong>{article.descripcion}</strong>
+          <p>Precio: ${article.price} | Stock: {article.stock}</p>
+          <button onClick={() => eliminarArticulo(article._id || article.id)}>Eliminar</button>
+          <button onClick={() => iniciarEdicion(article)}>Editar</button>
+        </div>
+      ))
+    ) : (
+      <p>No hay productos registrados.</p>
+    )}
+  </div>
+
+  
+  {editando && (
+    <div className='auth-container'>
+    <form onSubmit={actualizarArticulo} style={{ marginTop: '20px' }}>
+      <h3>Editar Producto</h3>
+      <input
+        type="text"
+        placeholder="Descripción"
+        value={formData.descripcion}
+        onChange={e => setFormData({ ...formData, descripcion: e.target.value })}
+        required
+      />
+      <input
+        type="number"
+        placeholder="Precio"
+        value={formData.price}
+        onChange={e => setFormData({ ...formData, price: e.target.value })}
+        required
+      />
+      <input
+        type="number"
+        placeholder="Stock"
+        value={formData.stock}
+        onChange={e => setFormData({ ...formData, stock: e.target.value })}
+        required
+      />
+      <button type="submit">Guardar Cambios</button>
+      <button type="button" onClick={() => setEditando(null)}>Cancelar</button>
+    </form>
     </div>
+  )}
+</div>
+
   );
 };
 

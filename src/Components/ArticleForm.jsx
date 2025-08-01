@@ -25,6 +25,7 @@ export default function ArticleForm() {
   };
 
   return (
+
     <div className="auth-container">
 
       {/* 🔽 Botón para ir a la lista de productos */}
