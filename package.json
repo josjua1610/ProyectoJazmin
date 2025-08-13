@@ -1,0 +1,71 @@
+{
+  "name": "auth-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@craco/craco": "^7.1.0",
+    "@faker-js/faker": "^9.9.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "assert": "^2.1.0",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "browserify-zlib": "^0.2.0",
+    "cors": "^2.8.5",
+    "crypto-browserify": "^3.12.1",
+    "express": "^5.1.0",
+    "https-browserify": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "leaflet": "^1.9.4",
+    "mongoose": "^8.17.1",
+    "mysql2": "^3.14.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.7.1",
+    "react-scripts": "5.0.1",
+    "sequelize": "^6.37.7",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.4",
+    "util": "^0.12.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "nodemon": "^3.1.10",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11"
+  }
+}
