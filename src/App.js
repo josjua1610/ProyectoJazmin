@@ -2,9 +2,9 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import RegisterProduct from './Components/RegisterProduct';
-import ArticleList from './Components/ArticleList';
-import ArticleForm from './Components/ArticleForm';
+import RegisterProduct from './components/RegisterProduct';
+import ArticleList from './components/ArticleList';
+import ArticleForm from './components/ArticleForm';
 
 import DashboardAdmin from './pages/DashboardAdmin';
 import DashboardVendedor from './pages/DashboardVendedor';
@@ -16,7 +16,7 @@ import ReporteVentas from './pages/ReporteVentas';
 import CreateSale from './pages/CreateSale';
 import VentasAdmin from './pages/VentasAdmin';
 
-import PrivateRoute from './Components/PrivateRoute';  // importa PrivateRoute
+import PrivateRoute from './components/PrivateRoute';  // importa PrivateRoute
 
 function App() {
   return (
@@ -25,13 +25,11 @@ function App() {
         <Route path="/" element={<Navigate to="/Login" />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
-
-        {/* Rutas de productos y artículos (pueden protegerse también si quieres) */}
         <Route path="/RegisterProduct" element={<RegisterProduct />} />
         <Route path="/ArticleForm" element={<ArticleForm />} />
         <Route path="/articles" element={<ArticleList />} />
-         <Route path="/crear-venta" element={<CreateSale token={localStorage.getItem('token')} />} />
-         <Route path="/ventas" element={<VentasAdmin />} />
+        <Route path="/crear-venta" element={<CreateSale token={localStorage.getItem('token')} />} />
+        <Route path="/ventas" element={<VentasAdmin />} />
         <Route
   path="/admin/users"
   element={
