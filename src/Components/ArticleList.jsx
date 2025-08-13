@@ -62,7 +62,7 @@ const ArticleList = () => {
   const handleEdit = (id) => navigate(`/admin/products/edit/${id}`);
 
   return (
-    <div style={styles.container}>
+    <div className='auth-container'>
       <h2 style={styles.title}>Lista de Productos</h2>
       {articles.length === 0 ? (
         <p style={styles.noData}>No hay productos disponibles.</p>

@@ -12,7 +12,7 @@ const RegisterProduct = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://192.168.1.65:8000/api/articles', {
+      const res = await fetch('http://localhost:8000/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -29,6 +29,7 @@ const RegisterProduct = () => {
   };
 
   return (
+  <div className='auth-container'>
     <form onSubmit={handleSubmit}>
       <input name="descripcion" placeholder="Descripción" value={form.descripcion} onChange={handleChange} required />
       <input name="price" type="number" placeholder="Precio" value={form.price} onChange={handleChange} required />
@@ -36,6 +37,7 @@ const RegisterProduct = () => {
       <button type="submit">Registrar Producto</button>
       {mensaje && <p>{mensaje}</p>}
     </form>
+  </div>
   );
 };
 
