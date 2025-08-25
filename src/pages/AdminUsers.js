@@ -12,7 +12,7 @@ const AdminUsers = () => {
   const [mensaje, setMensaje] = useState('');
 
   const fetchUsers = useCallback(() => {
-    fetch('http://192.168.1.65:8000/api/users', {
+    fetch('http://localhost:8000/api/users', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -31,8 +31,8 @@ const AdminUsers = () => {
   const handleSubmit = e => {
     e.preventDefault();
     const url = editId
-      ? `http://192.168.1.65:8000/api/users/${editId}`
-      : 'http://192.168.1.65:8000/api/users';
+      ? `http://localhost:8000/api/users/${editId}`
+      : 'http://localhost:8000/api/users';
     const method = editId ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -58,7 +58,7 @@ const AdminUsers = () => {
 
   const handleDelete = id => {
     if (!window.confirm('¿Eliminar usuario?')) return;
-    fetch(`http://192.168.1.65:8000/api/users/${id}`, {
+    fetch(`http://localhost:8000/api/users/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     })
