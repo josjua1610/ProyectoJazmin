@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 
-export const API_URL = 'http://10.142.55.114:8000/api';
+export const API_URL = 'http://172.20.10.7:8000/api';
 
 const DashboardVendedor = () => {
   const [ventas, setVentas] = useState([]);

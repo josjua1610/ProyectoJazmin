@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './AuthForm.css';
 import { Link, useNavigate } from 'react-router-dom';
 
-export const API_URL = 'http://10.142.55.114:8000/api'; // URL de tu Flask backend
+export const API_URL = 'https://backend-flask-rv1f.onrender.com/api';
 
 function Login() {
   const navigate = useNavigate();
