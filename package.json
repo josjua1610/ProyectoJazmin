@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@capacitor/android": "^7.4.2",
-    "@capacitor/cli": "^7.4.2",
-    "@capacitor/core": "^7.4.2",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "@craco/craco": "^7.1.0",
     "@faker-js/faker": "^9.9.0",
     "@testing-library/dom": "^10.4.0",
