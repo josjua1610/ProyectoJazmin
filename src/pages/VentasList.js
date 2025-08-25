@@ -16,7 +16,7 @@ const VentasList = ({ token }) => {
 
   // Fetch ventas
   useEffect(() => {
-    fetch('http://192.168.1.65:8000/api/ventas', {
+    fetch('http://localhost:8000/api/ventas', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -35,7 +35,7 @@ const VentasList = ({ token }) => {
 
   // Fetch ubicación
   useEffect(() => {
-    fetch('http://192.168.1.65:5000/api/ubicacion')
+    fetch('http://localhost:5000/api/ubicacion')
       .then(res => {
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
         return res.json();

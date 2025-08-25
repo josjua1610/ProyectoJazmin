@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
 
-export const API_URL = 'http://192.168.1.65:8000/api';
+export const API_URL = 'http://localhost:8000/api';
 
 
 const DashboardCliente = () => {
@@ -13,7 +13,7 @@ const DashboardCliente = () => {
   useEffect(() => {
     const fetchCompras = async () => {
       try {
-        const res = await fetch(`http://192.168.1.65:8000/api/ventas/mis-compras`, {
+        const res = await fetch(`http://localhost:8000/api/ventas/mis-compras`, {
   headers: { Authorization: `Bearer ${token}` },
 });
         if (res.ok) {
