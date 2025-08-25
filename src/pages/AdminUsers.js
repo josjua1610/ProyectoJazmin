@@ -1,15 +1,17 @@
 // src/pages/AdminUsers.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const AdminUsers = () => {
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'cliente' });
   const [editId, setEditId] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [error, setError] = useState(false);
 
   const fetchUsers = useCallback(() => {
     fetch('http://localhost:8000/api/users', {
@@ -17,7 +19,7 @@ const AdminUsers = () => {
     })
       .then(res => res.json())
       .then(setUsers)
-      .catch(console.error);
+      .catch(() => setError(true));
   }, [token]);
 
   useEffect(() => {
@@ -43,11 +45,15 @@ const AdminUsers = () => {
       .then(res => res.json())
       .then(data => {
         setMensaje(data.message || 'Operación realizada');
+        setError(false);
         setForm({ name: '', email: '', password: '', role: 'cliente' });
         setEditId(null);
         fetchUsers();
       })
-      .catch(() => setMensaje('Error en la operación'));
+      .catch(() => {
+        setMensaje('Error en la operación');
+        setError(true);
+      });
   };
 
   const handleEdit = user => {
@@ -65,9 +71,13 @@ const AdminUsers = () => {
       .then(res => res.json())
       .then(data => {
         setMensaje(data.message);
+        setError(false);
         fetchUsers();
       })
-      .catch(() => setMensaje('Error al eliminar'));
+      .catch(() => {
+        setMensaje('Error al eliminar');
+        setError(true);
+      });
   };
 
   const handleLogout = () => {
@@ -79,13 +89,44 @@ const AdminUsers = () => {
     <div style={styles.pageContainer}>
       {/* Navbar */}
       <header style={styles.navbar}>
-        <div style={styles.logo}>MiSistema</div>
+        <div style={styles.logo}>UrbanStyle - Admin</div>
         <nav style={styles.navLinks}>
-           <Link to="/dashboard-admin" style={styles.navLink}>Inicio</Link>  {/* este va al dashboard */}
-          <Link to="/admin/users" style={{ ...styles.navLink, fontWeight: '700', textDecoration: 'underline' }}>Usuarios</Link>
-          <Link to="/admin/products" style={styles.navLink}>Productos</Link>
-          <Link to="/ventas" style={styles.navLink}>Ventas</Link>
-          
+          <Link
+            to="/dashboard-admin"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/dashboard-admin' ? styles.activeLink : {}),
+            }}
+          >
+            Inicio
+          </Link>
+          <Link
+            to="/admin/users"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/admin/users' ? styles.activeLink : {}),
+            }}
+          >
+            Usuarios
+          </Link>
+          <Link
+            to="/admin/products"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/admin/products' ? styles.activeLink : {}),
+            }}
+          >
+            Productos
+          </Link>
+          <Link
+            to="/ventas"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/ventas' ? styles.activeLink : {}),
+            }}
+          >
+            Ventas
+          </Link>
         </nav>
         <button onClick={handleLogout} style={styles.logoutButton}>
           Cerrar Sesión
@@ -95,6 +136,7 @@ const AdminUsers = () => {
       {/* Main content */}
       <main style={styles.mainContent}>
         <h1 style={styles.title}>{editId ? 'Editar Usuario' : 'Crear Usuario'}</h1>
+
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
             name="name"
@@ -126,7 +168,7 @@ const AdminUsers = () => {
             value={form.role}
             onChange={handleChange}
             required
-            style={{ ...styles.input, paddingRight: 10 }}
+            style={styles.input}
           >
             <option value="cliente">Cliente</option>
             <option value="vendedor">Vendedor</option>
@@ -136,7 +178,12 @@ const AdminUsers = () => {
             {editId ? 'Actualizar' : 'Crear'}
           </button>
         </form>
-        {mensaje && <p style={styles.message}>{mensaje}</p>}
+
+        {mensaje && (
+          <p style={{ ...styles.message, color: error ? '#dc3545' : '#28a745' }}>
+            {mensaje}
+          </p>
+        )}
 
         <section style={{ marginTop: 40 }}>
           <h2 style={{ marginBottom: 20 }}>Usuarios existentes</h2>
@@ -153,8 +200,11 @@ const AdminUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(u => (
-                  <tr key={u._id}>
+                {users.map((u, i) => (
+                  <tr
+                    key={u._id}
+                    style={{ backgroundColor: i % 2 === 0 ? '#fafafa' : 'white' }}
+                  >
                     <td style={styles.td}>{u.name}</td>
                     <td style={styles.td}>{u.email}</td>
                     <td style={styles.td}>{u.role}</td>
@@ -175,98 +225,113 @@ const AdminUsers = () => {
 
 const styles = {
   pageContainer: {
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    fontFamily: "'Poppins', sans-serif",
     minHeight: '100vh',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f5f5',
     paddingBottom: 40,
   },
   navbar: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#007bff',
-    padding: '0 20px',
-    height: 60,
+    backgroundColor: '#111',
+    padding: '15px 30px',
     color: 'white',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 999,
   },
   logo: {
-    fontWeight: '700',
-    fontSize: '1.5rem',
+    fontWeight: '900',
+    fontSize: '1.4rem',
+    letterSpacing: '1px',
   },
   navLinks: {
     display: 'flex',
-    gap: '25px',
+    gap: '18px',
   },
   navLink: {
     color: 'white',
     textDecoration: 'none',
     fontWeight: '600',
     fontSize: '1rem',
-    transition: 'color 0.3s ease',
+    padding: '8px 14px',
+    borderRadius: 6,
+    transition: 'all 0.3s ease',
+  },
+  activeLink: {
+    backgroundColor: '#ff8c00',
+    color: 'white',
+    boxShadow: '0 3px 8px rgba(255,140,0,0.3)',
   },
   logoutButton: {
     backgroundColor: '#dc3545',
     border: 'none',
-    padding: '8px 14px',
-    borderRadius: '4px',
+    padding: '10px 16px',
+    borderRadius: 6,
     color: 'white',
-    fontWeight: '600',
+    fontWeight: '700',
     cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    transition: 'all 0.3s ease',
   },
   mainContent: {
     maxWidth: 960,
-    margin: '40px auto',
-    padding: '0 20px',
+    margin: '30px auto',
+    padding: '25px',
     backgroundColor: 'white',
-    borderRadius: 8,
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    borderRadius: 10,
+    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
   },
   title: {
-    color: '#007bff',
-    marginBottom: 30,
     textAlign: 'center',
+    color: '#ff8c00',
+    marginBottom: 25,
+    fontSize: '1.8rem',
+    fontWeight: '700',
   },
   form: {
     display: 'flex',
     gap: 12,
     flexWrap: 'wrap',
     justifyContent: 'center',
+    marginBottom: 20,
   },
   input: {
-    flex: '1 1 250px',
-    padding: 10,
-    fontSize: 16,
-    borderRadius: 4,
+    flex: '1 1 220px',
+    padding: '10px',
+    fontSize: 15,
+    borderRadius: 6,
     border: '1px solid #ccc',
   },
   submitButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#ff8c00',
     color: 'white',
     fontWeight: '600',
     border: 'none',
-    borderRadius: 4,
-    padding: '10px 30px',
+    borderRadius: 6,
+    padding: '10px 24px',
     cursor: 'pointer',
-    alignSelf: 'center',
+    transition: 'all 0.3s ease',
   },
   message: {
     textAlign: 'center',
     marginTop: 15,
-    color: '#28a745',
     fontWeight: '600',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   th: {
     borderBottom: '2px solid #ddd',
     textAlign: 'left',
     padding: '12px 10px',
+    backgroundColor: '#f2f2f2',
   },
   td: {
-    borderBottom: '1px solid #eee',
     padding: '10px',
   },
   editBtn: {
@@ -275,7 +340,7 @@ const styles = {
     color: 'white',
     border: 'none',
     borderRadius: 4,
-    padding: '6px 14px',
+    padding: '6px 12px',
     cursor: 'pointer',
   },
   deleteBtn: {
@@ -283,7 +348,7 @@ const styles = {
     color: 'white',
     border: 'none',
     borderRadius: 4,
-    padding: '6px 14px',
+    padding: '6px 12px',
     cursor: 'pointer',
   },
 };

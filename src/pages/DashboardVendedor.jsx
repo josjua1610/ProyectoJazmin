@@ -7,6 +7,7 @@ export const API_URL = 'http://localhost:8000/api';
 const DashboardVendedor = () => {
   const [ventas, setVentas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hover, setHover] = useState(false);
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
@@ -16,7 +17,6 @@ const DashboardVendedor = () => {
       return;
     }
 
-    // Traer solo las ventas del vendedor desde backend
     fetch(`${API_URL}/ventas`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -31,10 +31,8 @@ const DashboardVendedor = () => {
     navigate('/login');
   };
 
-  // Generar PDF ticket
   const generarPDF = (venta) => {
     const doc = new jsPDF();
-
     doc.setFontSize(18);
     doc.text('Ticket de Venta', 14, 22);
 
@@ -42,7 +40,6 @@ const DashboardVendedor = () => {
     doc.text(`Fecha: ${new Date(venta.fecha).toLocaleString()}`, 14, 32);
     doc.text(`Cliente: ${venta.id_cliente?.name || 'Cliente no encontrado'}`, 14, 40);
     doc.text(`Vendedor: Tú`, 14, 48);
-
     doc.text('Productos:', 14, 58);
 
     let y = 66;
@@ -70,16 +67,26 @@ const DashboardVendedor = () => {
   return (
     <>
       <header style={styles.navbar}>
-        <div style={styles.logo}>MiSistema</div>
+        <div style={styles.logo}>UrbanStyle</div>
         <nav style={styles.navLinks}>
-          <Link to="/crear-venta" style={styles.navLink}>Generar venta</Link>
+          <Link
+            to="/crear-venta"
+            style={{ 
+              ...styles.generateButton, 
+              ...(hover ? styles.generateButtonHover : {}) 
+            }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+          >
+            Generar venta
+          </Link>
         </nav>
         <button onClick={handleLogout} style={styles.logoutButton}>
           Cerrar Sesión
         </button>
       </header>
 
-      <div style={{ ...styles.container, marginTop: 80 }}>
+      <div style={{ ...styles.container, marginTop: 100 }}>
         <h1 style={styles.title}>Panel Vendedor</h1>
         <h2 style={styles.subtitle}>Ventas realizadas</h2>
 
@@ -120,21 +127,92 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#007bff',
+    backgroundColor: '#111111',
     padding: '0 20px',
-    height: 60,
+    height: 70,
     color: 'white',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
   },
-  logo: { fontWeight: '700', fontSize: '1.5rem' },
-  navLinks: { display: 'flex', gap: '25px' },
-  navLink: { color: 'white', textDecoration: 'none', fontWeight: '600', fontSize: '1rem' },
-  logoutButton: { backgroundColor: '#dc3545', border: 'none', padding: '8px 14px', borderRadius: 4, color: 'white', fontWeight: '600', cursor: 'pointer' },
-  container: { maxWidth: 900, margin: '20px auto', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", padding: '0 15px', color: '#333' },
-  title: { textAlign: 'center', color: '#007bff', marginBottom: 20, fontWeight: '700', fontSize: '2rem' },
-  subtitle: { marginTop: 30, marginBottom: 15, fontSize: '1.5rem', borderBottom: '2px solid #007bff', paddingBottom: 8 },
-  ventaCard: { border: '1px solid #ddd', borderRadius: 6, padding: 15, marginBottom: 15, backgroundColor: '#fafafa' },
-  total: { fontWeight: '700', fontSize: '1.1rem', color: '#007bff', marginTop: 10 },
-  pdfButton: { marginTop: 10, backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 5, cursor: 'pointer', fontWeight: '600' },
+  logo: { 
+    fontWeight: '900', 
+    fontSize: '1.8rem', 
+    letterSpacing: '2px',
+    color: '#ffffff',
+    textShadow: '2px 2px 5px rgba(255,255,255,0.2)',
+  },
+  navLinks: { display: 'flex', gap: '25px', alignItems: 'center' },
+  generateButton: {
+    background: 'linear-gradient(90deg, #ff8c00, #ff4d00)',
+    color: 'white',
+    fontWeight: '700',
+    padding: '10px 20px',
+    borderRadius: 8,
+    textDecoration: 'none',
+    boxShadow: '0 5px 15px rgba(255, 77, 0, 0.4)',
+    transition: 'all 0.3s ease',
+    fontSize: '1rem',
+    cursor: 'pointer',
+  },
+  generateButtonHover: {
+    transform: 'translateY(-3px) scale(1.05)',
+    boxShadow: '0 10px 25px rgba(255, 77, 0, 0.7)',
+  },
+  logoutButton: {
+    backgroundColor: '#dc3545',
+    border: 'none',
+    padding: '8px 14px',
+    borderRadius: 4,
+    color: 'white',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  container: { 
+    maxWidth: 900, 
+    margin: '20px auto', 
+    fontFamily: "'Poppins', sans-serif",
+    padding: '0 15px', 
+    color: '#333' 
+  },
+  title: { 
+    textAlign: 'center', 
+    color: '#ff8c00', 
+    marginBottom: 20, 
+    fontWeight: '800', 
+    fontSize: '2.2rem',
+    textShadow: '1px 1px 5px rgba(0,0,0,0.2)',
+  },
+  subtitle: { 
+    marginTop: 30, 
+    marginBottom: 15, 
+    fontSize: '1.5rem', 
+    borderBottom: '2px solid #ff8c00', 
+    paddingBottom: 8 
+  },
+  ventaCard: { 
+    borderRadius: 10, 
+    padding: 20, 
+    marginBottom: 20, 
+    background: 'linear-gradient(145deg, #f5f5f5, #eaeaea)',
+    boxShadow: '5px 5px 15px rgba(0,0,0,0.1)',
+  },
+  total: { 
+    fontWeight: '700', 
+    fontSize: '1.2rem', 
+    color: '#ff4d00', 
+    marginTop: 10 
+  },
+  pdfButton: { 
+    marginTop: 10, 
+    backgroundColor: '#111111', 
+    color: 'white', 
+    border: 'none', 
+    padding: '8px 14px', 
+    borderRadius: 6, 
+    cursor: 'pointer', 
+    fontWeight: '700',
+    transition: 'all 0.3s ease',
+  },
   error: { color: 'red', textAlign: 'center' },
 };
 

@@ -219,71 +219,43 @@ const AdminProducts = () => {
   return (
     <div style={styles.pageContainer}>
       <header style={styles.navbar}>
-        <div style={styles.logo}>MiSistema</div>
+        <div style={styles.logo}>UrbanStyle - Admin</div>
         <nav style={styles.navLinks}>
-          <Link to="/dashboard-admin" style={styles.navLink}>
-            Inicio
-          </Link>
-          <Link to="/admin/users" style={styles.navLink}>
-            Usuarios
-          </Link>
-          <Link
-            to="/admin/products"
-            style={{ ...styles.navLink, fontWeight: "700", textDecoration: "underline" }}
-          >
-            Productos
-          </Link>
-          <Link to="/ventas" style={styles.navLink}>
-            Ventas
-          </Link>
+          <Link to="/dashboard-admin" style={styles.navLink}>Inicio</Link>
+          <Link to="/admin/users" style={styles.navLink}>Usuarios</Link>
+          <Link to="/admin/products" style={{ ...styles.navLink, backgroundColor: "#ff8c00", color: "#fff" }}>Productos</Link>
+          <Link to="/ventas" style={styles.navLink}>Ventas</Link>
         </nav>
-        <button onClick={handleLogout} style={styles.logoutButton}>
-          Cerrar Sesión
-        </button>
+        <button onClick={handleLogout} style={styles.logoutButton}>Cerrar Sesión</button>
       </header>
 
       <main style={styles.mainContent}>
         <h1 style={styles.title}>{form.id ? "Editar Producto" : "Crear Producto"}</h1>
 
         <form onSubmit={handleSubmit} style={styles.form} encType="multipart/form-data">
-          <input
-            name="name"
-            placeholder="Nombre / Descripción"
-            value={form.name}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
+          <input name="name" placeholder="Nombre / Descripción" value={form.name} onChange={handleChange} required style={styles.input} />
 
           <div style={styles.row2}>
             <select name="type_id" value={form.type_id} onChange={handleChange} required style={styles.input}>
               <option value="">Tipo de prenda</option>
-              {types.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
+              {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
 
             <select name="brand_id" value={form.brand_id} onChange={handleChange} required style={styles.input}>
               <option value="">Marca</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
+              {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
           </div>
 
           <div style={styles.row2}>
             <select name="size_id" value={form.size_id} onChange={handleChange} required style={styles.input}>
               <option value="">Talla</option>
-              {sizes.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
+              {sizes.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
 
             <select name="color_id" value={form.color_id} onChange={handleChange} required style={styles.input}>
               <option value="">Color</option>
-              {colors.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
+              {colors.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
 
@@ -294,41 +266,13 @@ const AdminProducts = () => {
               <option value="female">Mujer</option>
             </select>
 
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              name="purchase_price"
-              placeholder="Precio de compra"
-              value={form.purchase_price}
-              onChange={handleChange}
-              required
-              style={styles.input}
-            />
+            <input type="number" step="0.01" min="0" name="purchase_price" placeholder="Precio de compra" value={form.purchase_price} onChange={handleChange} required style={styles.input} />
           </div>
 
           <div style={styles.row2}>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              name="sale_price"
-              placeholder="Precio de venta"
-              value={form.sale_price}
-              onChange={handleChange}
-              required
-              style={styles.input}
-            />
+            <input type="number" step="0.01" min="0" name="sale_price" placeholder="Precio de venta" value={form.sale_price} onChange={handleChange} required style={styles.input} />
 
-            <input
-              type="number"
-              min="0"
-              name="primary_index"
-              placeholder="Índice imagen principal (0,1,2..)"
-              value={form.primary_index}
-              onChange={handleChange}
-              style={styles.input}
-            />
+            <input type="number" min="0" name="primary_index" placeholder="Índice imagen principal (0,1,2..)" value={form.primary_index} onChange={handleChange} style={styles.input} />
           </div>
 
           <div style={{ flex: "1 1 100%", marginBottom: 12 }}>
@@ -373,11 +317,7 @@ const AdminProducts = () => {
                       <td style={styles.td}>{p.id}</td>
                       <td style={styles.td}>
                         {p.primary_image_url ? (
-                          <img
-                            src={p.primary_image_url}
-                            alt={p.name}
-                            style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 6 }}
-                          />
+                          <img src={p.primary_image_url} alt={p.name} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 6 }} />
                         ) : (
                           <span style={{ opacity: 0.6 }}>—</span>
                         )}
@@ -414,11 +354,11 @@ const AdminProducts = () => {
 
 const styles = {
   pageContainer: { fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", minHeight: "100vh", backgroundColor: "#f8f9fa", paddingBottom: 40 },
-  navbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#007bff", padding: "0 20px", height: 60, color: "white" },
-  logo: { fontWeight: "700", fontSize: "1.5rem" },
-  navLinks: { display: "flex", gap: "25px" },
-  navLink: { color: "white", textDecoration: "none", fontWeight: "600", fontSize: "1rem", transition: "color 0.3s ease" },
-  logoutButton: { backgroundColor: "#dc3545", border: "none", padding: "8px 14px", borderRadius: "4px", color: "white", fontWeight: "600", cursor: "pointer", transition: "background-color 0.3s ease" },
+  navbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#111111", padding: "15px 30px", color: "white", boxShadow: "0 4px 10px rgba(0,0,0,0.5)", position: "sticky", top: 0, zIndex: 999 },
+  logo: { fontWeight: "900", fontSize: "1.5rem", letterSpacing: "2px", textShadow: "1px 1px 5px rgba(255,255,255,0.2)" },
+  navLinks: { display: "flex", gap: "20px" },
+  navLink: { color: "white", textDecoration: "none", fontWeight: "600", fontSize: "1rem", padding: "8px 14px", borderRadius: 6, transition: "all 0.3s ease", backgroundColor: "rgba(255,255,255,0.05)" },
+  logoutButton: { backgroundColor: "#dc3545", border: "none", padding: "10px 18px", borderRadius: 6, color: "white", fontWeight: "700", cursor: "pointer", transition: "all 0.3s ease" },
   mainContent: { maxWidth: 1100, margin: "40px auto", padding: "20px", backgroundColor: "white", borderRadius: 8, boxShadow: "0 2px 10px rgba(0,0,0,0.1)" },
   title: { color: "#007bff", marginBottom: 20, textAlign: "center" },
   form: { display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" },

@@ -39,23 +39,21 @@ const VentasAdmin = () => {
     <div style={styles.pageContainer}>
       {/* Navbar */}
       <header style={styles.navbar}>
-        <div style={styles.logo}>MiSistema</div>
+        <div style={styles.logo}>UrbanStyle - Admin</div>
         <nav style={styles.navLinks}>
           <Link to="/dashboard-admin" style={styles.navLink}>Inicio</Link>
           <Link to="/admin/users" style={styles.navLink}>Usuarios</Link>
           <Link to="/admin/products" style={styles.navLink}>Productos</Link>
-          <Link to="/ventas" style={styles.navLink}>Ventas</Link>
+          <Link to="/ventas" style={{ ...styles.navLink, backgroundColor: '#ff8c00', color: '#fff' }}>Ventas</Link>
         </nav>
-        <button onClick={handleLogout} style={styles.logoutButton}>
-          Cerrar Sesión
-        </button>
+        <button onClick={handleLogout} style={styles.logoutButton}>Cerrar Sesión</button>
       </header>
 
       {/* Main Content */}
       <main style={styles.container}>
         <h1 style={styles.title}>Ventas registradas</h1>
         {ventas.length === 0 ? (
-          <p>No hay ventas registradas.</p>
+          <p style={{ textAlign: 'center' }}>No hay ventas registradas.</p>
         ) : (
           ventas.map(venta => {
             const totalVenta = venta.productos.reduce(
@@ -95,44 +93,47 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#007bff',
-    padding: '0 20px',
-    height: 60,
+    backgroundColor: '#111111',
+    padding: '15px 30px',
     color: 'white',
-    position: 'fixed',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+    position: 'sticky',
     top: 0,
-    left: 0,
-    right: 0,
     zIndex: 1000,
   },
   logo: {
-    fontWeight: '700',
+    fontWeight: '900',
     fontSize: '1.5rem',
+    letterSpacing: '2px',
+    textShadow: '1px 1px 5px rgba(255,255,255,0.2)',
   },
   navLinks: {
     display: 'flex',
-    gap: 25,
+    gap: '20px',
   },
   navLink: {
     color: 'white',
     textDecoration: 'none',
     fontWeight: '600',
     fontSize: '1rem',
-    transition: 'color 0.3s ease',
+    padding: '8px 14px',
+    borderRadius: 6,
+    transition: 'all 0.3s ease',
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   logoutButton: {
     backgroundColor: '#dc3545',
     border: 'none',
-    padding: '8px 14px',
-    borderRadius: 4,
+    padding: '10px 18px',
+    borderRadius: 6,
     color: 'white',
-    fontWeight: '600',
+    fontWeight: '700',
     cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    transition: 'all 0.3s ease',
   },
   container: {
     maxWidth: 900,
-    margin: '100px auto 40px', // margin-top para que no quede detrás del navbar fijo
+    margin: '100px auto 40px',
     padding: 20,
     color: '#333',
     backgroundColor: 'white',
@@ -149,9 +150,10 @@ const styles = {
   card: {
     border: '1px solid #ddd',
     borderRadius: 8,
-    padding: 15,
+    padding: 20,
     marginBottom: 20,
     backgroundColor: '#fafafa',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
   },
   total: {
     marginTop: 10,
@@ -160,10 +162,10 @@ const styles = {
     color: '#007bff',
   },
   loading: {
-    marginTop: 100,
+    marginTop: 120,
     textAlign: 'center',
     fontSize: '1.2rem',
-  }
+  },
 };
 
 export default VentasAdmin;

@@ -3,15 +3,12 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 export const API_URL = 'http://localhost:8000/api';
 
-
-
 const ReporteVentas = () => {
   const [reporte, setReporte] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-     fetch(`http://localhost:8000/api/reportes/ventas`, { // 👈 usamos getApiUrl()
-
+    fetch(`${API_URL}/reportes/ventas`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
@@ -25,29 +22,25 @@ const ReporteVentas = () => {
       });
   }, []);
 
-  if (loading) return <p>Cargando reporte...</p>;
-  if (!reporte) return <p>No se pudo cargar el reporte.</p>;
+  if (loading) return <p style={styles.loading}>Cargando reporte...</p>;
+  if (!reporte) return <p style={styles.error}>No se pudo cargar el reporte.</p>;
 
   const ventasPorDiaArray = reporte.ventasPorDia ? Object.entries(reporte.ventasPorDia) : [];
   const ventasPorUsuarioArray = reporte.ventasPorUsuario ? Object.entries(reporte.ventasPorUsuario) : [];
   const productosMasVendidosArray = reporte.productosMasVendidos || [];
 
-  // Función para generar PDF tipo ticket para una venta (pasa un objeto venta)
-  // Como ejemplo, aquí vamos a generar un ticket simple basado en las ventas por día
-  // Puedes adaptar a ventas individuales o las que tengas
   const generarTicketPDF = (fecha, datos) => {
     const doc = new jsPDF({
       unit: 'pt',
-      format: [280, 500], // tamaño ticket ancho x alto aprox
+      format: [280, 500],
     });
 
     const margin = 10;
     let y = margin;
 
-    // Título y encabezado
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Mi Tienda', 140, y, { align: 'center' });
+    doc.text('UrbanStyle', 140, y, { align: 'center' });
     y += 20;
 
     doc.setFontSize(10);
@@ -64,33 +57,33 @@ const ReporteVentas = () => {
     y += 30;
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Gracias por su compra!', 140, y, { align: 'center' });
+    doc.text('¡Gracias por su compra!', 140, y, { align: 'center' });
 
     doc.save(`Ticket_${fecha}.pdf`);
   };
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Reporte de Ventas</h1>
+      <h1 style={styles.title}>📊 Reporte de Ventas</h1>
 
       {/* Resumen General */}
       <section style={styles.section}>
         <h2 style={styles.subtitle}>Resumen General</h2>
         <div style={styles.summaryGrid}>
-          <div style={styles.summaryBox}>
+          <div style={{ ...styles.summaryBox, background: '#007bff20' }}>
             <strong>Total Ventas</strong>
             <p>{reporte.totalVentas}</p>
           </div>
-          <div style={styles.summaryBox}>
-            <strong>Total Items Vendidos</strong>
+          <div style={{ ...styles.summaryBox, background: '#28a74520' }}>
+            <strong>Total Items</strong>
             <p>{reporte.totalItems}</p>
           </div>
-          <div style={styles.summaryBox}>
-            <strong>Ingresos Totales</strong>
+          <div style={{ ...styles.summaryBox, background: '#ffc10720' }}>
+            <strong>Ingresos</strong>
             <p>${reporte.ingresos.toFixed(2)}</p>
           </div>
-          <div style={styles.summaryBox}>
-            <strong>Ganancias Totales</strong>
+          <div style={{ ...styles.summaryBox, background: '#dc354520' }}>
+            <strong>Ganancias</strong>
             <p>${reporte.ganancias.toFixed(2)}</p>
           </div>
         </div>
@@ -100,39 +93,41 @@ const ReporteVentas = () => {
       <section style={styles.section}>
         <h2 style={styles.subtitle}>Ventas por Día</h2>
         {ventasPorDiaArray.length === 0 ? (
-          <p>No hay datos disponibles para ventas por día.</p>
+          <p>No hay datos.</p>
         ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Ventas</th>
-                <th>Items</th>
-                <th>Ingresos</th>
-                <th>Ganancias</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ventasPorDiaArray.map(([fecha, datos]) => (
-                <tr key={fecha}>
-                  <td>{fecha}</td>
-                  <td>{datos.ventas}</td>
-                  <td>{datos.items}</td>
-                  <td>${datos.ingresos.toFixed(2)}</td>
-                  <td>${datos.ganancias.toFixed(2)}</td>
-                  <td>
-                    <button
-                      style={styles.btnPDF}
-                      onClick={() => generarTicketPDF(fecha, datos)}
-                    >
-                      Descargar Ticket
-                    </button>
-                  </td>
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Ventas</th>
+                  <th>Items</th>
+                  <th>Ingresos</th>
+                  <th>Ganancias</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {ventasPorDiaArray.map(([fecha, datos]) => (
+                  <tr key={fecha}>
+                    <td>{fecha}</td>
+                    <td>{datos.ventas}</td>
+                    <td>{datos.items}</td>
+                    <td>${datos.ingresos.toFixed(2)}</td>
+                    <td>${datos.ganancias.toFixed(2)}</td>
+                    <td>
+                      <button
+                        style={styles.btnPDF}
+                        onClick={() => generarTicketPDF(fecha, datos)}
+                      >
+                        🧾 PDF
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 
@@ -140,59 +135,63 @@ const ReporteVentas = () => {
       <section style={styles.section}>
         <h2 style={styles.subtitle}>Ventas por Usuario</h2>
         {ventasPorUsuarioArray.length === 0 ? (
-          <p>No hay datos disponibles para ventas por usuario.</p>
+          <p>No hay datos.</p>
         ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Ventas</th>
-                <th>Items</th>
-                <th>Ingresos</th>
-                <th>Ganancias</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ventasPorUsuarioArray.map(([usuario, datos]) => (
-                <tr key={usuario}>
-                  <td>{usuario}</td>
-                  <td>{datos.ventas}</td>
-                  <td>{datos.items}</td>
-                  <td>${datos.ingresos.toFixed(2)}</td>
-                  <td>${datos.ganancias.toFixed(2)}</td>
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Ventas</th>
+                  <th>Items</th>
+                  <th>Ingresos</th>
+                  <th>Ganancias</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {ventasPorUsuarioArray.map(([usuario, datos]) => (
+                  <tr key={usuario}>
+                    <td>{usuario}</td>
+                    <td>{datos.ventas}</td>
+                    <td>{datos.items}</td>
+                    <td>${datos.ingresos.toFixed(2)}</td>
+                    <td>${datos.ganancias.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 
       {/* Productos más vendidos */}
       <section style={styles.section}>
-        <h2 style={styles.subtitle}>Productos más Vendidos</h2>
+        <h2 style={styles.subtitle}>🔥 Productos más Vendidos</h2>
         {productosMasVendidosArray.length === 0 ? (
-          <p>No hay datos disponibles para productos más vendidos.</p>
+          <p>No hay datos.</p>
         ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Cantidad Vendida</th>
-                <th>Ingresos</th>
-                <th>Ganancias</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productosMasVendidosArray.map((prod) => (
-                <tr key={prod.id_producto}>
-                  <td>{prod.descripcion}</td>
-                  <td>{prod.cantidad}</td>
-                  <td>${prod.ingresos.toFixed(2)}</td>
-                  <td>${prod.ganancias.toFixed(2)}</td>
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Ingresos</th>
+                  <th>Ganancias</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {productosMasVendidosArray.map((prod) => (
+                  <tr key={prod.id_producto}>
+                    <td>{prod.descripcion}</td>
+                    <td>{prod.cantidad}</td>
+                    <td>${prod.ingresos.toFixed(2)}</td>
+                    <td>${prod.ganancias.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>
@@ -201,43 +200,48 @@ const ReporteVentas = () => {
 
 const styles = {
   container: {
-    maxWidth: '960px',
-    margin: '20px auto',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    maxWidth: '1100px',
+    margin: '30px auto',
+    fontFamily: "'Poppins', sans-serif",
     color: '#333',
     padding: '0 15px',
   },
   title: {
     textAlign: 'center',
-    fontWeight: '700',
-    fontSize: '2.5rem',
+    fontWeight: '800',
+    fontSize: '2.2rem',
     marginBottom: '30px',
-    color: '#007bff',
+    color: '#111',
   },
   section: {
     marginBottom: '40px',
   },
   subtitle: {
-    fontSize: '1.5rem',
-    borderBottom: '2px solid #007bff',
+    fontSize: '1.3rem',
+    fontWeight: '700',
+    borderBottom: '3px solid #007bff',
     paddingBottom: '8px',
     marginBottom: '20px',
+    color: '#007bff',
   },
   summaryGrid: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '15px',
   },
   summaryBox: {
-    flex: '1 1 200px',
-    backgroundColor: '#e9f2ff',
-    margin: '10px',
     padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+    borderRadius: '10px',
+    boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
     textAlign: 'center',
     fontSize: '1.2rem',
     fontWeight: '600',
+    transition: 'transform 0.2s ease',
+  },
+  tableContainer: {
+    overflowX: 'auto',
+    borderRadius: '8px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
   },
   table: {
     width: '100%',
@@ -248,11 +252,21 @@ const styles = {
     backgroundColor: '#007bff',
     border: 'none',
     color: 'white',
-    borderRadius: '4px',
+    borderRadius: '6px',
     cursor: 'pointer',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
   },
-  btnPDFHover: {
-    backgroundColor: '#0056b3',
+  loading: {
+    textAlign: 'center',
+    fontSize: '1.2rem',
+    marginTop: '20px',
+  },
+  error: {
+    textAlign: 'center',
+    color: 'red',
+    fontWeight: '600',
+    marginTop: '20px',
   },
 };
 

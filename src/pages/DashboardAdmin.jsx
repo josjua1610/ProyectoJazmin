@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import ReporteVentas from './ReporteVentas';
 
 const DashboardAdmin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -14,12 +15,44 @@ const DashboardAdmin = () => {
     <div style={styles.pageContainer}>
       {/* Navbar */}
       <header style={styles.navbar}>
-        <div style={styles.logo}>MiSistema</div>
+        <div style={styles.logo}>UrbanStyle - Admin</div>
         <nav style={styles.navLinks}>
-          <Link to="/dashboard-admin" style={styles.navLink}>Inicio</Link>
-          <Link to="/admin/users" style={styles.navLink}>Usuarios</Link>
-          <Link to="/admin/products" style={styles.navLink}>Productos</Link>
-          <Link to="/ventas" style={styles.navLink}>Ventas</Link>
+          <Link
+            to="/dashboard-admin"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/dashboard-admin' ? styles.activeLink : {}),
+            }}
+          >
+            Inicio
+          </Link>
+          <Link
+            to="/admin/users"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/admin/users' ? styles.activeLink : {}),
+            }}
+          >
+            Usuarios
+          </Link>
+          <Link
+            to="/admin/products"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/admin/products' ? styles.activeLink : {}),
+            }}
+          >
+            Productos
+          </Link>
+          <Link
+            to="/ventas"
+            style={{
+              ...styles.navLink,
+              ...(location.pathname === '/ventas' ? styles.activeLink : {}),
+            }}
+          >
+            Ventas
+          </Link>
         </nav>
         <button onClick={handleLogout} style={styles.logoutButton}>
           Cerrar Sesión
@@ -43,28 +76,35 @@ const DashboardAdmin = () => {
 
 const styles = {
   pageContainer: {
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    fontFamily: "'Poppins', sans-serif",
+    backgroundColor: '#f5f5f5',
     minHeight: '100vh',
-    backgroundColor: '#f8f9fa',
+    paddingBottom: 40,
   },
   navbar: {
     display: 'flex',
-    flexWrap: 'wrap', // Permite que los elementos bajen en móviles
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#007bff',
-    padding: '10px 15px',
+    backgroundColor: '#111111',
+    padding: '15px 30px',
     color: 'white',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 999,
   },
   logo: {
-    fontWeight: '700',
-    fontSize: '1.3rem',
+    fontWeight: '900',
+    fontSize: '1.6rem',
+    letterSpacing: '2px',
+    textShadow: '1px 1px 6px rgba(255,255,255,0.2)',
     flex: '1 1 auto',
   },
   navLinks: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '15px',
+    gap: '18px',
     justifyContent: 'center',
     flex: '2 1 auto',
   },
@@ -72,42 +112,55 @@ const styles = {
     color: 'white',
     textDecoration: 'none',
     fontWeight: '600',
-    fontSize: '0.95rem',
+    fontSize: '1rem',
+    padding: '10px 16px',
+    borderRadius: 8,
+    transition: 'all 0.3s ease',
+  },
+  activeLink: {
+    backgroundColor: '#ff8c00',
+    color: '#fff',
+    boxShadow: '0 3px 8px rgba(255,140,0,0.4)',
   },
   logoutButton: {
     backgroundColor: '#dc3545',
     border: 'none',
-    padding: '8px 12px',
-    borderRadius: '4px',
+    padding: '10px 18px',
+    borderRadius: 6,
     color: 'white',
-    fontWeight: '600',
+    fontWeight: '700',
     cursor: 'pointer',
+    transition: 'all 0.3s ease',
     flex: '1 1 auto',
-    maxWidth: '120px',
+    maxWidth: '140px',
     marginTop: '5px',
   },
   mainContent: {
-    maxWidth: '95%',
-    margin: '20px auto',
-    padding: '15px',
+    maxWidth: 960,
+    margin: '30px auto',
+    padding: '20px',
     backgroundColor: 'white',
-    borderRadius: 8,
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    borderRadius: 12,
+    boxShadow: '0 5px 20px rgba(0,0,0,0.07)',
   },
   title: {
     textAlign: 'center',
-    color: '#007bff',
-    marginBottom: 20,
-    fontSize: '1.5rem',
+    color: '#ff8c00',
+    marginBottom: 25,
+    fontSize: '2rem',
+    fontWeight: '800',
+    textShadow: '1px 1px 5px rgba(0,0,0,0.2)',
   },
   welcomeSection: {
     fontSize: '1rem',
-    color: '#333',
+    color: '#555',
     lineHeight: 1.6,
+    marginBottom: 25,
+    padding: '10px 0',
   },
 };
 
-// Media Queries
+// Media Queries con CSS dinámico
 const styleSheet = document.styleSheets[0];
 styleSheet.insertRule(`
   @media (max-width: 768px) {
@@ -117,7 +170,12 @@ styleSheet.insertRule(`
       text-align: center;
     }
     nav {
-      margin-top: 10px;
+      margin-top: 12px;
+      flex-direction: column !important;
+      gap: 10px !important;
+    }
+    button {
+      margin-top: 15px !important;
     }
   }
 `, styleSheet.cssRules.length);

@@ -3,19 +3,19 @@ import jsPDF from 'jspdf';
 
 export const API_URL = 'http://localhost:8000/api';
 
-
 const DashboardCliente = () => {
   const [compras, setCompras] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hoverDownload, setHoverDownload] = useState(null);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchCompras = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/ventas/mis-compras`, {
-  headers: { Authorization: `Bearer ${token}` },
-});
+        const res = await fetch(`${API_URL}/ventas/mis-compras`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (res.ok) {
           const data = await res.json();
           setCompras(data);
@@ -50,8 +50,9 @@ const DashboardCliente = () => {
     yPos += 10;
 
     compra.productos.forEach((p, index) => {
+      const nombre = p.descripcion || p.id_producto || 'Producto';
       doc.text(
-        `${index + 1}. ${p.descripcion} - Cantidad: ${p.cantidad} - Precio unitario: $${p.price.toFixed(2)}`,
+        `${index + 1}. ${nombre} - Cantidad: ${p.cantidad} - Precio unitario: $${p.price.toFixed(2)}`,
         14,
         yPos
       );
@@ -71,7 +72,7 @@ const DashboardCliente = () => {
   return (
     <div style={styles.pageContainer}>
       <header style={styles.navbar}>
-        <div style={styles.logo}>MiSistema - Cliente</div>
+        <div style={styles.logo}>UrbanStyle - Cliente</div>
         <button onClick={handleLogout} style={styles.logoutButton}>
           Cerrar Sesión
         </button>
@@ -82,7 +83,7 @@ const DashboardCliente = () => {
         {compras.length === 0 ? (
           <p style={styles.noCompras}>No tienes compras registradas.</p>
         ) : (
-          compras.map((compra) => {
+          compras.map((compra, index) => {
             const totalCompra = compra.productos.reduce(
               (acc, p) => acc + p.price * p.cantidad,
               0
@@ -94,18 +95,28 @@ const DashboardCliente = () => {
                   <p><strong>Fecha:</strong> {new Date(compra.fecha).toLocaleDateString()}</p>
                   <p><strong>Vendedor:</strong> {compra.id_vendedor?.name || 'Desconocido'}</p>
                 </div>
-                <ul style={styles.productList}>
-                  {compra.productos.map((producto) => (
-                    <li key={producto.id_producto} style={styles.productItem}>
-                      <span style={styles.productDesc}>{producto.descripcion}</span>
-                      <span style={styles.productCantidad}>Cantidad: {producto.cantidad}</span>
-                      <span style={styles.productPrecio}>Precio unitario: ${producto.price.toFixed(2)}</span>
-                    </li>
+
+                {/* Productos comprados */}
+                <div style={styles.productGrid}>
+                  {compra.productos.map((producto, i) => (
+                    <div key={i} style={styles.productMiniCard}>
+                      <p style={styles.productDesc}>
+                        {producto.descripcion || producto.id_producto || 'Producto '}
+                      </p>
+                      <p style={styles.productCantidad}>x{producto.cantidad}</p>
+                      <p style={styles.productPrecio}>${producto.price.toFixed(2)}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
+
                 <p style={styles.totalText}><strong>Total de la compra:</strong> ${totalCompra.toFixed(2)}</p>
                 <button
-                  style={styles.downloadButton}
+                  style={{
+                    ...styles.downloadButton,
+                    ...(hoverDownload === index ? styles.downloadButtonHover : {}),
+                  }}
+                  onMouseEnter={() => setHoverDownload(index)}
+                  onMouseLeave={() => setHoverDownload(null)}
                   onClick={() => downloadPDF(compra)}
                 >
                   Descargar Ticket PDF
@@ -121,13 +132,13 @@ const DashboardCliente = () => {
 
 const styles = {
   pageContainer: {
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    backgroundColor: '#f7f9fc',
+    fontFamily: "'Poppins', sans-serif",
+    backgroundColor: '#f5f5f5',
     minHeight: '100vh',
     paddingBottom: 40,
   },
   navbar: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#111111',
     padding: '15px 30px',
     color: 'white',
     display: 'flex',
@@ -138,9 +149,13 @@ const styles = {
     position: 'sticky',
     top: 0,
     zIndex: 999,
+    boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
   },
   logo: {
     userSelect: 'none',
+    fontWeight: '900',
+    letterSpacing: '2px',
+    textShadow: '2px 2px 5px rgba(255,255,255,0.2)',
   },
   logoutButton: {
     backgroundColor: '#dc3545',
@@ -150,7 +165,7 @@ const styles = {
     color: 'white',
     fontWeight: '700',
     cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    transition: 'all 0.3s ease',
   },
   main: {
     maxWidth: 960,
@@ -158,11 +173,12 @@ const styles = {
     padding: '0 20px',
   },
   title: {
-    color: '#007bff',
+    color: '#ff8c00',
     textAlign: 'center',
     marginBottom: 30,
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: '2rem',
+    textShadow: '1px 1px 5px rgba(0,0,0,0.2)',
   },
   noCompras: {
     textAlign: 'center',
@@ -172,12 +188,12 @@ const styles = {
   compraCard: {
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 25,
+    padding: 20,
     marginBottom: 25,
     boxShadow: '0 5px 15px rgba(0,0,0,0.07)',
     display: 'flex',
     flexDirection: 'column',
-    gap: 18,
+    gap: 15,
   },
   compraHeader: {
     display: 'flex',
@@ -186,53 +202,54 @@ const styles = {
     fontSize: '1.1rem',
     color: '#333',
   },
-  productList: {
-    listStyleType: 'none',
-    paddingLeft: 0,
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  productItem: {
+  productGrid: {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr 1fr',
-    gap: 12,
-    padding: '8px 12px',
-    borderRadius: 6,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: 10,
+    marginTop: 10,
+  },
+  productMiniCard: {
     backgroundColor: '#f4f6f8',
-    color: '#444',
-    fontSize: '1rem',
-    alignItems: 'center',
+    padding: 8,
+    borderRadius: 6,
+    textAlign: 'center',
   },
   productDesc: {
     fontWeight: '600',
+    fontSize: '0.9rem',
   },
   productCantidad: {
-    textAlign: 'center',
-    fontWeight: '500',
+    fontSize: '0.85rem',
+    color: '#555',
   },
   productPrecio: {
-    textAlign: 'right',
-    fontWeight: '500',
+    fontWeight: '600',
+    fontSize: '0.85rem',
+    color: '#007bff',
   },
   totalText: {
     fontSize: '1.2rem',
     fontWeight: '700',
     textAlign: 'right',
     marginTop: 10,
-    color: '#007bff',
+    color: '#ff4d00',
   },
   downloadButton: {
     backgroundColor: '#28a745',
     border: 'none',
-    padding: '12px 20px',
+    padding: '10px 16px',
     color: 'white',
     fontWeight: '700',
     borderRadius: 8,
     cursor: 'pointer',
     alignSelf: 'flex-start',
-    transition: 'background-color 0.3s ease',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 5px 15px rgba(40,167,69,0.4)',
+    marginTop: 10,
+  },
+  downloadButtonHover: {
+    transform: 'translateY(-3px) scale(1.05)',
+    boxShadow: '0 10px 25px rgba(40,167,69,0.7)',
   },
   loading: {
     textAlign: 'center',
