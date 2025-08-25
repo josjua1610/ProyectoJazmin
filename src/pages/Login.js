@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import './AuthForm.css';
 import { Link, useNavigate } from 'react-router-dom';
-export const API_URL = 'http://192.168.1.65:8000/api';
+
+export const API_URL = 'http://localhost:8000/api'; // URL de tu Flask backend
 
 function Login() {
   const navigate = useNavigate();
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  });
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
 
   const handleChange = e => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -17,7 +15,7 @@ function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://192.168.1.65:8000/api/login`, { 
+      const res = await fetch(`${API_URL}/auth/login`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
@@ -29,16 +27,12 @@ function Login() {
         localStorage.setItem('role', data.role);
         localStorage.setItem('name', data.name);
 
-        // Redirigir según el rol
-        if (data.role === 'admin') {
-          navigate('/dashboard-admin');
-        } else if (data.role === 'vendedor') {
-          navigate('/dashboard-vendedor');
-        } else {
-          navigate('/dashboard-cliente');
-        }
+        // Redirigir según rol
+        if (data.role === 'admin') navigate('/dashboard-admin');
+        else if (data.role === 'vendedor') navigate('/dashboard-vendedor');
+        else navigate('/dashboard-cliente');
       } else {
-        alert("Credenciales incorrectas");
+        alert(data.message || "Credenciales incorrectas");
       }
     } catch (error) {
       console.error(error);

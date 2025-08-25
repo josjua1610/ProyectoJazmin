@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import RegisterProduct from './pages/RegisterProduct';
-import ArticleList from './components/ArticleList';
-import ArticleForm from './components/ArticleForm';
+import ArticleList from './Components/ArticleList';
+import ArticleForm from './Components/ArticleForm';
 
 import DashboardAdmin from './pages/DashboardAdmin';
 import DashboardVendedor from './pages/DashboardVendedor';
@@ -16,7 +16,7 @@ import ReporteVentas from './pages/ReporteVentas';
 import CreateSale from './pages/CreateSale';
 import VentasAdmin from './pages/VentasAdmin';
 
-import PrivateRoute from './components/PrivateRoute';  // importa PrivateRoute
+import PrivateRoute from './Components/PrivateRoute';  // importa PrivateRoute
 
 function App() {
   return (
