@@ -20,7 +20,7 @@ const CreateSale = ({ token }) => {
       .catch(console.error);
 
     // Obtener clientes (corregido)
-   fetch('http://localhost:8000/api/users/clientes', {
+   fetch('http://10.142.55.114:8000/api/users/clientes', {
   headers: { Authorization: `Bearer ${token}` },
 })
   .then(res => res.json())

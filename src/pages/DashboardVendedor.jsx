@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 
-export const API_URL = 'http://localhost:8000/api';
+export const API_URL = 'http://10.142.55.114:8000/api';
 
 const DashboardVendedor = () => {
   const [ventas, setVentas] = useState([]);
@@ -11,20 +11,23 @@ const DashboardVendedor = () => {
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+  // ✅ función para obtener ventas
+  const fetchVentas = useCallback(() => {
+    if (!token) return;
 
+    setLoading(true);
     fetch(`${API_URL}/ventas`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
       .then(data => setVentas(Array.isArray(data) ? data : []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [token]);
+
+  useEffect(() => {
+    fetchVentas(); // cargar ventas al montar
+  }, [fetchVentas]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -35,11 +38,10 @@ const DashboardVendedor = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text('Ticket de Venta', 14, 22);
-
     doc.setFontSize(12);
     doc.text(`Fecha: ${new Date(venta.fecha).toLocaleString()}`, 14, 32);
     doc.text(`Cliente: ${venta.id_cliente?.name || 'Cliente no encontrado'}`, 14, 40);
-    doc.text(`Vendedor: Tú`, 14, 48);
+    doc.text(`Vendedor: ${venta.id_vendedor?.name || 'Tú'}`, 14, 48);
     doc.text('Productos:', 14, 58);
 
     let y = 66;
@@ -51,18 +53,8 @@ const DashboardVendedor = () => {
 
     const total = venta.productos.reduce((sum, p) => sum + p.cantidad * p.price, 0);
     doc.text(`Total de la venta: $${total.toFixed(2)}`, 14, y + 8);
-
     doc.save(`ticket-venta-${venta._id}.pdf`);
   };
-
-  if (!token) {
-    return (
-      <div style={styles.container}>
-        <h1>Panel Vendedor</h1>
-        <p style={styles.error}>No has iniciado sesión.</p>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -71,12 +63,10 @@ const DashboardVendedor = () => {
         <nav style={styles.navLinks}>
           <Link
             to="/crear-venta"
-            style={{ 
-              ...styles.generateButton, 
-              ...(hover ? styles.generateButtonHover : {}) 
-            }}
+            style={{ ...styles.generateButton, ...(hover ? styles.generateButtonHover : {}) }}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
+            onClick={() => fetchVentas()} // 🔹 refresca ventas al volver de crear
           >
             Generar venta
           </Link>
@@ -101,10 +91,11 @@ const DashboardVendedor = () => {
               <div key={venta._id} style={styles.ventaCard}>
                 <p><strong>Fecha:</strong> {new Date(venta.fecha).toLocaleString()}</p>
                 <p><strong>Cliente:</strong> {venta.id_cliente?.name || 'Cliente no encontrado'}</p>
+                <p><strong>Vendedor:</strong> {venta.id_vendedor?.name || 'Tú'}</p>
                 <p><strong>Productos:</strong></p>
                 <ul>
                   {venta.productos.map((p) => (
-                    <li key={p.product_id || p._id}>
+                    <li key={p.id_producto || p._id}>
                       {p.descripcion || p.product_id} - Cantidad: {p.cantidad} - Precio: ${p.price.toFixed(2)}
                     </li>
                   ))}
