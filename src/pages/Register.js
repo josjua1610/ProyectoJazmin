@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './AuthForm.css';
 import { Link } from 'react-router-dom';
 
-export const API_URL = 'http://172.20.10.7:8000/api'; // URL de tu Flask backend
+export const API_URL = 'https://backend-flask-rv1f.onrender.com/api'; // URL de tu Flask backend
 
 function Register() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });

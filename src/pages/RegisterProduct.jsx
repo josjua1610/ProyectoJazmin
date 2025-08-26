@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://172.20.10.7:8000/api";
+const API = "http://192.168.1.80:8000/api";
 
 const ADD_NEW_VALUE = "__add_new__";
 

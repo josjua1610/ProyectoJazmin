@@ -16,7 +16,7 @@ const VentasList = ({ token }) => {
 
   // Fetch ventas
   useEffect(() => {
-    fetch('http://172.20.10.7:8000/api/ventas', {
+    fetch('http://192.168.1.80:8000/api/ventas', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

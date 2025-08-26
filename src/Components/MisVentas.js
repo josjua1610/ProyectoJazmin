@@ -4,7 +4,7 @@ const MisVentas = ({ token }) => {
   const [ventas, setVentas] = useState([]);
 
   useEffect(() => {
-    fetch('http://10.142.55.114:8000/api/ventas/mis-ventas', {
+    fetch('http://192.168.1.80:8000/api/ventas/mis-ventas', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

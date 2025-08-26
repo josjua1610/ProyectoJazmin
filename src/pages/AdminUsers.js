@@ -14,7 +14,7 @@ const AdminUsers = () => {
   const [error, setError] = useState(false);
 
   const fetchUsers = useCallback(() => {
-    fetch('http://172.20.10.7:8000/api/users', {
+    fetch('http://192.168.1.80:8000/api/users', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -33,8 +33,8 @@ const AdminUsers = () => {
   const handleSubmit = e => {
     e.preventDefault();
     const url = editId
-      ? `http://172.20.10.7:8000/api/users/${editId}`
-      : 'http://172.20.10.7:8000/api/users';
+      ? `http://192.168.1.80:8000/api/users/${editId}`
+      : 'http://192.168.1.80:8000/api/users';
     const method = editId ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -64,7 +64,7 @@ const AdminUsers = () => {
 
   const handleDelete = id => {
     if (!window.confirm('¿Eliminar usuario?')) return;
-    fetch(`http://172.20.10.7:8000/api/users/${id}`, {
+    fetch(`http://192.168.1.80:8000/api/users/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     })

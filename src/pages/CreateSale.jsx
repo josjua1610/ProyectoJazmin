@@ -8,6 +8,8 @@ const CreateSale = ({ token }) => {
   const [productosVenta, setProductosVenta] = useState([]);
   const [mensaje, setMensaje] = useState('');
   const [hover, setHover] = useState(false);
+  const [searchId, setSearchId] = useState('');
+  const [productoSeleccionado, setProductoSeleccionado] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,19 +21,47 @@ const CreateSale = ({ token }) => {
       .then(data => setProductos(Array.isArray(data.data) ? data.data : []))
       .catch(console.error);
 
-    // Obtener clientes (corregido)
-   fetch('http://172.20.10.7:8000/api/users/clientes', {
-  headers: { Authorization: `Bearer ${token}` },
-})
-  .then(res => res.json())
-  .then(data => setClientes(Array.isArray(data) ? data : []))
-  .catch(console.error);
-
+    // Obtener clientes
+    fetch('http://192.168.1.80:8000/api/users/clientes', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(data => setClientes(Array.isArray(data) ? data : []))
+      .catch(console.error);
   }, [token]);
 
   const agregarProducto = (id_producto) => {
-    if (!id_producto || productosVenta.find(p => p.id_producto === id_producto)) return;
-    setProductosVenta([...productosVenta, { id_producto, cantidad: 1 }]);
+    if (!id_producto) return;
+    setProductosVenta(prev => {
+      const existente = prev.find(p => p.id_producto === id_producto);
+      if (existente) {
+        return prev.map(p =>
+          p.id_producto === id_producto
+            ? { ...p, cantidad: p.cantidad + 1 }
+            : p
+        );
+      }
+      return [...prev, { id_producto, cantidad: 1 }];
+    });
+  };
+
+  const buscarPorId = async () => {
+    if (!searchId) return;
+    try {
+      const res = await fetch(`http://127.0.0.1:8001/api/clothes/by-id/${searchId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Producto no encontrado");
+      const data = await res.json();
+      if (data?.id) {
+        agregarProducto(data.id);
+        setMensaje(`Producto ${data.name} agregado ✅`);
+      } else {
+        setMensaje("Producto no encontrado");
+      }
+    } catch (err) {
+      setMensaje("Error al buscar producto por ID");
+    }
   };
 
   const cambiarCantidad = (id_producto, delta) => {
@@ -80,6 +110,7 @@ const CreateSale = ({ token }) => {
         setMensaje('Venta creada con éxito');
         setSelectedCliente('');
         setProductosVenta([]);
+        setProductoSeleccionado('');
       } else {
         const errorData = await res.json();
         setMensaje('Error: ' + (errorData.error || 'No se pudo crear la venta'));
@@ -110,6 +141,7 @@ const CreateSale = ({ token }) => {
         <h2 style={styles.title}>Crear Venta</h2>
 
         <form onSubmit={handleSubmit} style={styles.form}>
+          {/* Seleccionar Cliente */}
           <div style={styles.section}>
             <label style={styles.label}>Cliente:</label>
             <select
@@ -125,50 +157,95 @@ const CreateSale = ({ token }) => {
             </select>
           </div>
 
+          {/* Seleccionar producto desde menú desplegable */}
           <div style={styles.section}>
-            <label style={styles.label}>Agregar Producto:</label>
-            <select
-              onChange={e => { agregarProducto(Number(e.target.value)); e.target.value = ''; }}
-              defaultValue=""
-              style={{ ...styles.select, maxHeight: 200, overflowY: 'auto' }}
-            >
-              <option value="" disabled>-- Seleccionar producto --</option>
-              {productos.map(p => (
-                <option key={p.id} value={p.id}>
-                  {p.name} | {p.type?.name || ''} | {p.brand?.name || ''} | {p.size?.name || ''} | {p.color?.name || ''} (${p.sale_price})
-                </option>
-              ))}
-            </select>
+            <label style={styles.label}>Agregar producto:</label>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select
+                value={productoSeleccionado}
+                onChange={e => setProductoSeleccionado(e.target.value)}
+                style={{ flex: 1, padding: "8px", borderRadius: 6, border: "1px solid #ccc" }}
+              >
+                <option value="">-- Selecciona un producto --</option>
+                {productos.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} | {p.brand?.name || ''} | ${p.sale_price}
+                  </option>
+                ))}
+              </select>
+            <button
+  type="button"
+  onClick={() => {
+    if (productoSeleccionado) {
+      agregarProducto(Number(productoSeleccionado));
+      setProductoSeleccionado('');
+    }
+  }}
+  style={styles.submitButton}
+>
+  Agregar
+</button>
+
+            </div>
           </div>
 
-          <div style={styles.cardsContainer}>
-            {productosVenta.map(pv => {
-              const prod = productos.find(p => p.id === pv.id_producto);
-              if (!prod) return null;
-              return (
-                <div key={pv.id_producto} style={styles.card}>
-                  <div>
-                    <p style={styles.productName}>{prod.name}</p>
-                    <p style={styles.productDetails}>
-                      {prod.type?.name || ''} | {prod.brand?.name || ''} | {prod.size?.name || ''} | {prod.color?.name || ''}
-                    </p>
-                  </div>
-                  <div style={styles.cardActions}>
-                    <div style={styles.quantityControl}>
-                      <button type="button" onClick={() => cambiarCantidad(pv.id_producto, -1)} style={styles.qtyBtn}>-</button>
-                      <span style={styles.qty}>{pv.cantidad}</span>
-                      <button type="button" onClick={() => cambiarCantidad(pv.id_producto, 1)} style={styles.qtyBtn}>+</button>
-                    </div>
-                    <p style={styles.price}>${(prod.sale_price * pv.cantidad).toFixed(2)}</p>
-                    <button type="button" onClick={() => quitarProducto(pv.id_producto)} style={styles.removeButton}>Quitar</button>
-                  </div>
-                </div>
-              );
-            })}
+          {/* Buscar producto por ID */}
+          <div style={styles.section}>
+            <label style={styles.label}>Buscar producto por ID:</label>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <input
+                type="number"
+                value={searchId}
+                onChange={e => setSearchId(e.target.value)}
+                placeholder="ID del producto"
+                style={{ flex: 1, padding: "8px", borderRadius: 6, border: "1px solid #ccc" }}
+              />
+              <button type="button" onClick={buscarPorId} style={styles.submitButton}>
+                Buscar y Agregar
+              </button>
+            </div>
           </div>
 
+          {/* Carrito de productos agregados */}
           {productosVenta.length > 0 && (
-            <p style={styles.total}>Total de la venta: <strong>${totalVenta.toFixed(2)}</strong></p>
+            <div style={styles.section}>
+              <h3>Carrito de Venta</h3>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ backgroundColor: "#eee" }}>
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productosVenta.map(pv => {
+                    const prod = productos.find(p => p.id === pv.id_producto);
+                    if (!prod) return null;
+                    return (
+                      <tr key={pv.id_producto}>
+                        <td>{prod.id}</td>
+                        <td>{prod.name}</td>
+                        <td>
+                          <button type="button" onClick={() => cambiarCantidad(pv.id_producto, -1)} style={styles.qtyBtn}>-</button>
+                          <span style={styles.qty}>{pv.cantidad}</span>
+                          <button type="button" onClick={() => cambiarCantidad(pv.id_producto, 1)} style={styles.qtyBtn}>+</button>
+                        </td>
+                        <td>${prod.sale_price}</td>
+                        <td>${(prod.sale_price * pv.cantidad).toFixed(2)}</td>
+                        <td>
+                          <button type="button" onClick={() => quitarProducto(pv.id_producto)} style={styles.removeButton}>❌</button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <p style={styles.total}>Total de la venta: <strong>${totalVenta.toFixed(2)}</strong></p>
+            </div>
           )}
 
           {mensaje && <p style={styles.message}>{mensaje}</p>}
@@ -212,15 +289,8 @@ const styles = {
   section: { display: 'flex', flexDirection: 'column', gap: '6px' },
   label: { fontWeight: '600' },
   select: { padding: '8px', fontSize: '1rem', borderRadius: 6, border: '1px solid #ccc' },
-  cardsContainer: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginTop: 15 },
-  card: { backgroundColor: 'white', padding: '12px', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' },
-  productName: { fontWeight: '700', marginBottom: 4 },
-  productDetails: { fontSize: 12, color: '#555', marginBottom: 10 },
-  cardActions: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  quantityControl: { display: 'flex', alignItems: 'center', gap: 5 },
-  qtyBtn: { width: 28, height: 28, borderRadius: 4, border: '1px solid #ccc', backgroundColor: '#f0f0f0', cursor: 'pointer', fontWeight: '700', transition: 'all 0.2s ease' },
+  qtyBtn: { width: 28, height: 28, borderRadius: 4, border: '1px solid #ccc', backgroundColor: '#f0f0f0', cursor: 'pointer', fontWeight: '700', transition: 'all 0.2s ease', margin: '0 3px' },
   qty: { width: 24, textAlign: 'center', fontWeight: '600' },
-  price: { fontWeight: '600', color: '#ff4d00' },
   removeButton: { backgroundColor: '#dc3545', border: 'none', padding: '6px 10px', color: 'white', borderRadius: 6, cursor: 'pointer', transition: 'all 0.2s ease' },
   total: { marginTop: 15, textAlign: 'right', fontWeight: '700', fontSize: '1.2rem', color: '#ff4d00' },
   message: { color: '#dc3545', fontWeight: '600', textAlign: 'center', marginTop: 10 },
