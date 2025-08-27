@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://192.168.1.80:8000/api";
+const API = "http://172.20.10.7:8000/api";
 const mxn = (v) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(v||0));
 
 const ArticleList = () => {

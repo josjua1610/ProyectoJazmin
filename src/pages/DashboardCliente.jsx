@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
 
-export const API_URL = 'http://192.168.1.80:8000/api';
+export const API_URL = 'http://172.20.10.7:8000/api';
 
 const DashboardCliente = () => {
   const [compras, setCompras] = useState([]);

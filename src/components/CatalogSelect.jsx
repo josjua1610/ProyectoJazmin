@@ -1,7 +1,7 @@
 // src/components/CatalogSelect.jsx
 import React, { useEffect, useState } from "react";
 
-const API_BASE = "http://192.168.1.80:8000/api";
+const API_BASE = "http://172.20.10.7:8000/api";
 
 export default function CatalogSelect({
   label, name, value, onChange, resource, extraFields = {}, token

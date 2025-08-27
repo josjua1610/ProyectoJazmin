@@ -11,7 +11,7 @@ const VentasAdmin = () => {
   useEffect(() => {
     const fetchVentas = async () => {
       try {
-        const res = await fetch('http://192.168.1.80:8000/api/ventas/all', {
+        const res = await fetch('http://172.20.10.7:8000/api/ventas/all', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Error al cargar ventas');

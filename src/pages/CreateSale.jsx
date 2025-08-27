@@ -22,7 +22,7 @@ const CreateSale = ({ token }) => {
       .catch(console.error);
 
     // Obtener clientes
-    fetch('http://192.168.1.80:8000/api/users/clientes', {
+    fetch('http://172.20.10.7:8000/api/users/clientes', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -113,7 +113,7 @@ const CreateSale = ({ token }) => {
         setProductoSeleccionado('');
       } else {
         const errorData = await res.json();
-        setMensaje('Error: ' + (errorData.error || 'No se pudo crear la venta'));
+        setMensaje('Error: ' + (errorData.message || 'No se pudo crear la venta'));
       }
     } catch {
       setMensaje('Error al conectar con el servidor');

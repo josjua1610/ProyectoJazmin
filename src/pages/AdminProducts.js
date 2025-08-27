@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const API_BASE = "http://127.0.0.1:8001/api"; // ⚠ Asegúrate que Laravel corre aquí
+const API_BASE = "http://127.0.0.1:8001/api";
 
 const mxn = (v) =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(v || 0));
@@ -29,6 +29,7 @@ const AdminProducts = () => {
     gender: "unisex",
     purchase_price: "",
     sale_price: "",
+    stock: 0,
     primary_index: 0,
   });
 
@@ -79,6 +80,7 @@ const AdminProducts = () => {
           gender: it.gender,
           purchase_price: it.purchase_price,
           sale_price: it.sale_price,
+          stock: it.stock ?? 0,
           primary_image_url:
             it.primary_image?.url ||
             it.images?.find((x) => x.is_primary)?.url ||
@@ -118,6 +120,7 @@ const AdminProducts = () => {
       gender: "unisex",
       purchase_price: "",
       sale_price: "",
+      stock: 0,
       primary_index: 0,
     });
     if (filesRef.current) filesRef.current.value = "";
@@ -139,6 +142,7 @@ const AdminProducts = () => {
       fd.append("gender", form.gender);
       fd.append("purchase_price", form.purchase_price);
       fd.append("sale_price", form.sale_price);
+      fd.append("stock", form.stock);
 
       const files = Array.from(filesRef.current?.files || []);
       files.forEach((f) => fd.append("images[]", f));
@@ -176,19 +180,19 @@ const AdminProducts = () => {
 
   const handleEdit = (p) => {
     setMensaje("");
-    setForm((prev) => ({
-      ...prev,
+    setForm({
       id: p.id,
       name: p.name,
-      type_id: "",
-      brand_id: "",
-      size_id: "",
-      color_id: "",
+       type_id: p.type_id || "",    // <-- agregado
+    brand_id: p.brand_id || "",  // <-- agregado
+    size_id: p.size_id || "",    // <-- agregado
+    color_id: p.color_id || "",  // <-- agregado
       gender: p.gender || "unisex",
       purchase_price: p.purchase_price ?? "",
       sale_price: p.sale_price ?? "",
+      stock: p.stock ?? 0,
       primary_index: 0,
-    }));
+    });
     if (filesRef.current) filesRef.current.value = "";
   };
 
@@ -233,57 +237,116 @@ const AdminProducts = () => {
         <h1 style={styles.title}>{form.id ? "Editar Producto" : "Crear Producto"}</h1>
 
         <form onSubmit={handleSubmit} style={styles.form} encType="multipart/form-data">
-          <input name="name" placeholder="Nombre / Descripción" value={form.name} onChange={handleChange} required style={styles.input} />
+  <input
+    name="name"
+    placeholder="Nombre / Descripción"
+    value={form.name}
+    onChange={handleChange}
+    required
+    style={styles.input}
+  />
+  {form.id && <small style={styles.legend}>Nombre o descripción del producto</small>}
 
-          <div style={styles.row2}>
-            <select name="type_id" value={form.type_id} onChange={handleChange} required style={styles.input}>
-              <option value="">Tipo de prenda</option>
-              {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+  <div style={styles.row2}>
+    <select name="type_id" value={form.type_id} onChange={handleChange} required style={styles.input}>
+      <option value="">Tipo de prenda</option>
+      {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+    </select>
+    {form.id && <small style={styles.legend}>Tipo de prenda (ej. camiseta, pantalón)</small>}
 
-            <select name="brand_id" value={form.brand_id} onChange={handleChange} required style={styles.input}>
-              <option value="">Marca</option>
-              {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-          </div>
+    <select name="brand_id" value={form.brand_id} onChange={handleChange} required style={styles.input}>
+      <option value="">Marca</option>
+      {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+    </select>
+    {form.id && <small style={styles.legend}>Marca del producto</small>}
+  </div>
 
-          <div style={styles.row2}>
-            <select name="size_id" value={form.size_id} onChange={handleChange} required style={styles.input}>
-              <option value="">Talla</option>
-              {sizes.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+  <div style={styles.row2}>
+    <select name="size_id" value={form.size_id} onChange={handleChange} required style={styles.input}>
+      <option value="">Talla</option>
+      {sizes.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+    </select>
+    {form.id && <small style={styles.legend}>Talla del producto</small>}
 
-            <select name="color_id" value={form.color_id} onChange={handleChange} required style={styles.input}>
-              <option value="">Color</option>
-              {colors.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
+    <select name="color_id" value={form.color_id} onChange={handleChange} required style={styles.input}>
+      <option value="">Color</option>
+      {colors.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+    </select>
+    {form.id && <small style={styles.legend}>Color del producto</small>}
+  </div>
 
-          <div style={styles.row2}>
-            <select name="gender" value={form.gender} onChange={handleChange} required style={styles.input}>
-              <option value="unisex">Unisex</option>
-              <option value="male">Hombre</option>
-              <option value="female">Mujer</option>
-            </select>
+  <div style={styles.row2}>
+    <select name="gender" value={form.gender} onChange={handleChange} required style={styles.input}>
+      <option value="unisex">Unisex</option>
+      <option value="male">Hombre</option>
+      <option value="female">Mujer</option>
+    </select>
+    {form.id && <small style={styles.legend}>Género al que está dirigido</small>}
 
-            <input type="number" step="0.01" min="0" name="purchase_price" placeholder="Precio de compra" value={form.purchase_price} onChange={handleChange} required style={styles.input} />
-          </div>
+    <input
+      type="number"
+      step="0.01"
+      min="0"
+      name="purchase_price"
+      placeholder="Precio de compra"
+      value={form.purchase_price}
+      onChange={handleChange}
+      required
+      style={styles.input}
+    />
+    {form.id && <small style={styles.legend}>Precio de compra del producto</small>}
+  </div>
 
-          <div style={styles.row2}>
-            <input type="number" step="0.01" min="0" name="sale_price" placeholder="Precio de venta" value={form.sale_price} onChange={handleChange} required style={styles.input} />
+  <div style={styles.row2}>
+    <input
+      type="number"
+      step="0.01"
+      min="0"
+      name="sale_price"
+      placeholder="Precio de venta"
+      value={form.sale_price}
+      onChange={handleChange}
+      required
+      style={styles.input}
+    />
+    {form.id && <small style={styles.legend}>Precio de venta del producto</small>}
 
-            <input type="number" min="0" name="primary_index" placeholder="Índice imagen principal (0,1,2..)" value={form.primary_index} onChange={handleChange} style={styles.input} />
-          </div>
+    <input
+      type="number"
+      min="0"
+      name="stock"
+      placeholder="Stock"
+      value={form.stock}
+      onChange={handleChange}
+      required
+      style={styles.input}
+    />
+    {form.id && <small style={styles.legend}>Cantidad disponible en inventario</small>}
+  </div>
 
-          <div style={{ flex: "1 1 100%", marginBottom: 12 }}>
-            <label>Imágenes (opcional): </label>
-            <input type="file" multiple accept="image/*" ref={filesRef} />
-          </div>
+  <div style={styles.row2}>
+    <input
+      type="number"
+      min="0"
+      name="primary_index"
+      placeholder="Índice imagen principal (0,1,2..)"
+      value={form.primary_index}
+      onChange={handleChange}
+      style={styles.input}
+    />
+    {form.id && <small style={styles.legend}>Número de la imagen principal (0 = primera imagen)</small>}
+  </div>
 
-          <button type="submit" disabled={submitting} style={styles.submitButton}>
-            {form.id ? (submitting ? "Actualizando..." : "Actualizar") : submitting ? "Creando..." : "Crear"}
-          </button>
-        </form>
+  <div style={{ flex: "1 1 100%", marginBottom: 12 }}>
+    <label>Imágenes (opcional): </label>
+    <input type="file" multiple accept="image/*" ref={filesRef} />
+    {form.id && <small style={styles.legend}>Se pueden subir varias imágenes; seleccionar principal arriba</small>}
+  </div>
+
+  <button type="submit" disabled={submitting} style={styles.submitButton}>
+    {form.id ? (submitting ? "Actualizando..." : "Actualizar") : submitting ? "Creando..." : "Crear"}
+  </button>
+</form>
 
         {mensaje && <p style={styles.message}>{mensaje}</p>}
 
@@ -308,6 +371,7 @@ const AdminProducts = () => {
                     <th style={styles.th}>Género</th>
                     <th style={styles.th}>Compra</th>
                     <th style={styles.th}>Venta</th>
+                    <th style={styles.th}>Stock</th>
                     <th style={styles.th}>Acciones</th>
                   </tr>
                 </thead>
@@ -330,6 +394,7 @@ const AdminProducts = () => {
                       <td style={styles.td}>{p.gender}</td>
                       <td style={styles.td}>{mxn(p.purchase_price)}</td>
                       <td style={styles.td}>{mxn(p.sale_price)}</td>
+                      <td style={styles.td}>{p.stock}</td>
                       <td style={styles.td}>
                         <button style={styles.editBtn} onClick={() => handleEdit(p)}>Editar</button>
                         <button style={styles.deleteBtn} onClick={() => handleDelete(p.id)}>Eliminar</button>
