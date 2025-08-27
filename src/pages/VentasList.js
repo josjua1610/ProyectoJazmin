@@ -35,23 +35,7 @@ const VentasList = ({ token }) => {
       });
   }, [token]);
 
-  // Fetch ubicación
-  useEffect(() => {
-    fetch('http://localhost:5000/api/ubicacion')
-      .then(res => {
-        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        setUbicacion(data);
-        setLoadingUbicacion(false);
-      })
-      .catch(err => {
-        console.error('Error cargando ubicación:', err);
-        setErrorUbicacion(true);
-        setLoadingUbicacion(false);
-      });
-  }, []);
+
 
   return (
     <div style={styles.pageContainer}>
