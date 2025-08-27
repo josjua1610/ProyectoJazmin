@@ -1,3 +1,5 @@
+// backend/models/Venta.js
+
 const mongoose = require('mongoose');
 
 const ventaSchema = new mongoose.Schema({
